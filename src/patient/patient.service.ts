@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -23,12 +24,43 @@ export class PatientService {
    ******** Create Patient ***************
    *************************************/
   async createPatient(patientData: CreatePatientDto): Promise<IPatient> {
-    try {
-      const newPatient = new this.patientModel(patientData);
-      return await newPatient.save();
-    } catch (error) {
-      this.logger.error(`${PatientService.name} - Failed to create patient`);
-      throw new InternalServerErrorException(error.message);
+    // If patientData includes uniqueGovID, check if it already exists
+    if (patientData.uniqueGovID) {
+      const patient = await this.patientModel.findOne({
+        uniqueGovID: patientData.uniqueGovID,
+      });
+      // If patient with uniqueGovID already exists, throw an error
+      if (patient) {
+        this.logger.error(
+          `Patient with uniqueGovID: ${patientData.uniqueGovID} already exists`,
+        );
+
+        throw new BadRequestException(
+          `Patient with uniqueGovID: ${patientData.uniqueGovID} already exists`,
+        );
+      }
+      // Create a new patient
+      else {
+        try {
+          return await this.patientModel.create(patientData);
+        } catch (error) {
+          this.logger.error(`Failed to create patient`);
+          this.logger.error(error.message);
+
+          throw new InternalServerErrorException(`Failed to create patient`);
+        }
+      }
+    }
+    // Otherwise, create a new patient
+    else {
+      try {
+        return await this.patientModel.create(patientData);
+      } catch (error) {
+        this.logger.error(`Failed to create patient`);
+        this.logger.error(error.message);
+
+        throw new InternalServerErrorException(`Failed to create patient`);
+      }
     }
   }
 

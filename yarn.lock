@@ -3,9 +3,9 @@
 
 
 "@aafiat/common@^1.0.17":
-  version "1.0.19"
-  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-1.0.19.tgz#fc207b62d47e6c2506a8479060c1619eb5c504ca"
-  integrity sha1-/CB7YtR+bCUGqEeQYMFhnrXFBMo=
+  version "1.0.20"
+  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-1.0.20.tgz#1071c970ff2e600d795e166104988d2238521a89"
+  integrity sha1-EHHJcP8uYA15XhZhBJiNIjhSGok=
 
 "@ampproject/remapping@^2.2.0":
   version "2.3.0"

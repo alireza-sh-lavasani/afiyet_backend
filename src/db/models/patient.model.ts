@@ -35,6 +35,9 @@ export default class Patient implements IPatient {
 
   @Prop({ type: [Types.ObjectId], ref: 'Examination', required: true })
   examinations: Types.ObjectId[];
+
+  @Prop({ required: true, default: null })
+  birthDate: Date;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);

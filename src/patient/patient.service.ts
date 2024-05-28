@@ -28,7 +28,7 @@ export class PatientService {
   async createPatient(patientData: CreatePatientDto): Promise<IPatient> {
     try {
       // Generate a new patientID
-      const patientId = await this.patientIdService.generatePatientId(
+      const patientId = await this.patientIdService.getPatientId(
         patientData.fullName,
         patientData.birthDate,
       );

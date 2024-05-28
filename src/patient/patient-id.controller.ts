@@ -18,10 +18,7 @@ export class PatientIdController {
   async generatePatientId(@Body() body: GeneratePatientIdDto) {
     const { fullName, birthDateIso } = body;
 
-    return await this.patientIdService.generatePatientId(
-      fullName,
-      birthDateIso,
-    );
+    return await this.patientIdService.getPatientId(fullName, birthDateIso);
   }
 
   // Endpoint to check and reassign IDs to avoid collisions

@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Body,
-  UsePipes,
   NotFoundException,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
@@ -16,6 +15,7 @@ import {
 } from './dto/create-patient.dto';
 import {
   UpdatePatientDto,
+  UpdatePatientParamsSchema,
   UpdatePatientSchema,
 } from './dto/update-patient.dto';
 import { IPatient } from '@aafiat/common';
@@ -29,22 +29,28 @@ export class PatientController {
    ******** Create Patient ***************
    *************************************/
   @Post()
-  @UsePipes(new ZodValidationPipe(CreatePatientSchema))
-  async create(@Body() createPatientDto: CreatePatientDto): Promise<IPatient> {
+  async create(
+    @Body(new ZodValidationPipe(CreatePatientSchema))
+    createPatientDto: CreatePatientDto,
+  ): Promise<IPatient> {
     return await this.patientService.createPatient(createPatientDto);
   }
 
   /**************************************
    ******** Update Patient ***************
    *************************************/
-  @Put(':id')
-  @UsePipes(new ZodValidationPipe(UpdatePatientSchema))
+  @Put(':patientId')
   async update(
-    @Param('id') id: string,
-    @Body() updatePatientDto: UpdatePatientDto,
+    @Param('patientId', new ZodValidationPipe(UpdatePatientParamsSchema))
+    patientId: string,
+    @Body(new ZodValidationPipe(UpdatePatientSchema))
+    updatePatientDto: UpdatePatientDto,
   ): Promise<IPatient> {
     try {
-      return await this.patientService.updatePatient(id, updatePatientDto);
+      return await this.patientService.updatePatient(
+        patientId,
+        updatePatientDto,
+      );
     } catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -53,10 +59,10 @@ export class PatientController {
   /**************************************
    ******** Delete Patient ***************
    *************************************/
-  @Delete(':id')
-  async delete(@Param('id') id: string): Promise<IPatient> {
+  @Delete(':patientId')
+  async delete(@Param('patientId') patientId: string): Promise<IPatient> {
     try {
-      return await this.patientService.deletePatient(id);
+      return await this.patientService.deletePatient(patientId);
     } catch (error) {
       throw new NotFoundException(error.message);
     }
@@ -73,12 +79,8 @@ export class PatientController {
   /**************************************
    ******** Get Patient By ID ***************
    *************************************/
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<IPatient> {
-    try {
-      return await this.patientService.getPatientById(id);
-    } catch (error) {
-      throw new NotFoundException(error.message);
-    }
+  @Get(':patientId')
+  async findOne(@Param('patientId') patientId: string): Promise<IPatient> {
+    return await this.patientService.getPatientById(patientId);
   }
 }

@@ -5,7 +5,7 @@ import { IPatient } from '@aafiat/common';
 export type PatientDocument = HydratedDocument<Patient>;
 
 @Schema({ timestamps: true })
-export default class Patient implements IPatient {
+export class Patient implements IPatient {
   @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
   _id: Types.ObjectId;
 
@@ -30,17 +30,20 @@ export default class Patient implements IPatient {
   @Prop({ required: true, default: null })
   maritalStatus: string;
 
-  @Prop({ default: null, unique: true, index: true })
+  @Prop({ default: null })
   uniqueGovID: string;
 
   @Prop({ type: [Types.ObjectId], ref: 'Examination', required: true })
   examinations: Types.ObjectId[];
 
-  @Prop({ required: true, default: null })
+  @Prop({ required: true, default: null, unique: true, index: true })
   birthDate: Date;
+
+  @Prop({ required: true, default: null })
+  patientID: string;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);
 
-// Create the unique index for uniqueGovID
-PatientSchema.index({ uniqueGovID: 1 }, { unique: true });
+// Create the unique index for patientID
+PatientSchema.index({ patientID: 1 }, { unique: true });

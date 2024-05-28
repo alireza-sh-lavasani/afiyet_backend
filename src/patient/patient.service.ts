@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { IPatient } from '@aafiat/common';
-import Patient from 'src/db/models/patient.model';
+import { Patient } from 'src/db/models/patient.model';
 import { Model } from 'mongoose';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
@@ -71,9 +71,20 @@ export class PatientService {
     id: string,
     patientData: UpdatePatientDto,
   ): Promise<IPatient> {
-    return await this.patientModel.findByIdAndUpdate(id, patientData, {
-      new: true,
-    });
+    try {
+      const patient = await this.patientModel.findById(id).exec(); // Find patient by id
+      if (!patient) {
+        throw new BadRequestException(`Patient with id: ${id} not found`);
+      }
+
+      // Update patient with new data
+      Object.assign(patient, patientData);
+
+      return await patient.save();
+    } catch (error) {
+      this.logger.error(`Failed to update patient with id: ${id}`);
+      throw error;
+    }
   }
 
   /**************************************
@@ -94,6 +105,17 @@ export class PatientService {
    ******** Get Patient By ID ***************
    *************************************/
   async getPatientById(id: string): Promise<IPatient> {
-    return await this.patientModel.findById(id).exec();
+    try {
+      const patient = await this.patientModel.findById(id).exec();
+      if (!patient) {
+        throw new BadRequestException(`Patient with id: ${id} not found`);
+      }
+
+      return patient;
+    } catch (error) {
+      this.logger.error(`Failed to get patient with id: ${id}`);
+      this.logger.error(error.message);
+      throw error;
+    }
   }
 }

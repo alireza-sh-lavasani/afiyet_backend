@@ -27,16 +27,16 @@ export class PatientService {
    *************************************/
   async createPatient(patientData: CreatePatientDto): Promise<IPatient> {
     try {
-      // Generate a new patientID
+      // Generate a new patientId
       const patientId = await this.patientIdService.getPatientId(
         patientData.fullName,
         patientData.birthDate,
       );
 
-      // Create a new patient with the generated patientID
+      // Create a new patient with the generated patientId
       return await this.patientModel.create({
         ...patientData,
-        patientID: patientId,
+        patientId,
       });
     } catch (error) {
       this.logger.error(`Failed to create patient`);

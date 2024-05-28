@@ -40,10 +40,10 @@ export class Patient implements IPatient {
   birthDate: Date;
 
   @Prop({ required: true, default: null })
-  patientID: string;
+  patientId: string;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);
 
-// Create the unique index for patientID
-PatientSchema.index({ patientID: 1 }, { unique: true });
+// Create the unique index for patientId
+PatientSchema.index({ patientId: 1 }, { unique: true });

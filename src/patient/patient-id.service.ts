@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as moment from 'moment';
@@ -6,6 +10,8 @@ import { PatientId, PatientIdDocument } from 'src/db/models/patient-id.model';
 
 @Injectable()
 export class PatientIdService {
+  logger = new Logger(PatientIdService.name);
+
   constructor(
     @InjectModel(PatientId.name)
     private patientIdModel: Model<PatientIdDocument>,
@@ -36,42 +42,54 @@ export class PatientIdService {
     fullName: string,
     birthDateIso: string,
   ): Promise<string> {
-    const initials = this.extractInitials(fullName); // Extract initials from full name
-    const birthDatePart = moment(birthDateIso).format('YYYYMMDD'); // Format birthdate as YYYYMMDD
-    const sequenceNumber = this.generateRandomSequenceNumber(); // Generate random sequence number
-    const sequenceNumberPadded = this.padNumber(sequenceNumber, 4); // Pad sequence number to 4 digits
-    const patientId = `${initials}${birthDatePart}${sequenceNumberPadded}`; // Construct patient ID
+    try {
+      const initials = this.extractInitials(fullName); // Extract initials from full name
+      const birthDatePart = moment(birthDateIso).format('YYYYMMDD'); // Format birthdate as YYYYMMDD
+      const sequenceNumber = this.generateRandomSequenceNumber(); // Generate random sequence number
+      const sequenceNumberPadded = this.padNumber(sequenceNumber, 4); // Pad sequence number to 4 digits
+      const patientId = `${initials}${birthDatePart}${sequenceNumberPadded}`; // Construct patient ID
 
-    // Save the generated patient ID to the database
-    const newPatientId = new this.patientIdModel({
-      id: patientId,
-      dateKey: birthDatePart,
-      sequenceNumber,
-    });
-    await newPatientId.save();
+      // Save the generated patient ID to the database
+      const newPatientId = new this.patientIdModel({
+        id: patientId,
+        dateKey: birthDatePart,
+        sequenceNumber,
+      });
+      await newPatientId.save();
 
-    return patientId;
+      return patientId;
+    } catch (error) {
+      this.logger.error(`Failed to generate patient ID`);
+      this.logger.error(error.message);
+      throw new InternalServerErrorException(`Failed to generate patient ID`);
+    }
   }
 
   // Function to check and reassign patient IDs to avoid collisions
   public async checkAndReassignPatientIds(
     patientIds: string[],
   ): Promise<string[]> {
-    const reassignedIds = [];
+    try {
+      const reassignedIds = [];
 
-    for (let id of patientIds) {
-      let exists = await this.patientIdModel.findOne({ id });
-      while (exists) {
-        const initials = id.slice(0, 2);
-        const birthDatePart = id.slice(2, 10);
-        const newSequenceNumber = this.generateRandomSequenceNumber(); // Generate a new random sequence number
-        const newSequenceNumberPadded = this.padNumber(newSequenceNumber, 4); // Pad the sequence number
-        id = `${initials}${birthDatePart}${newSequenceNumberPadded}`; // Construct a new patient ID
-        exists = await this.patientIdModel.findOne({ id }); // Check if the new ID already exists
+      for (let id of patientIds) {
+        let exists = await this.patientIdModel.findOne({ id });
+        while (exists) {
+          const initials = id.slice(0, 2);
+          const birthDatePart = id.slice(2, 10);
+          const newSequenceNumber = this.generateRandomSequenceNumber(); // Generate a new random sequence number
+          const newSequenceNumberPadded = this.padNumber(newSequenceNumber, 4); // Pad the sequence number
+          id = `${initials}${birthDatePart}${newSequenceNumberPadded}`; // Construct a new patient ID
+          exists = await this.patientIdModel.findOne({ id }); // Check if the new ID already exists
+        }
+        reassignedIds.push(id); // Add the unique ID to the reassigned list
       }
-      reassignedIds.push(id); // Add the unique ID to the reassigned list
-    }
 
-    return reassignedIds;
+      return reassignedIds;
+    } catch (error) {
+      this.logger.error(`Failed to reassign patient IDs`);
+      this.logger.error(error.message);
+      throw new InternalServerErrorException(`Failed to reassign patient IDs`);
+    }
   }
 }

@@ -10,6 +10,7 @@ import { Patient } from 'src/db/models/patient.model';
 import { Model } from 'mongoose';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { PatientIdService } from './patient-id.service';
 
 @Injectable()
 export class PatientService {
@@ -18,49 +19,30 @@ export class PatientService {
   constructor(
     @InjectModel(Patient.name)
     private readonly patientModel: Model<IPatient>,
+    private readonly patientIdService: PatientIdService,
   ) {}
 
   /**************************************
    ******** Create Patient ***************
    *************************************/
   async createPatient(patientData: CreatePatientDto): Promise<IPatient> {
-    // If patientData includes uniqueGovID, check if it already exists
-    if (patientData.uniqueGovID) {
-      const patient = await this.patientModel.findOne({
-        uniqueGovID: patientData.uniqueGovID,
+    try {
+      // Generate a new patientID
+      const patientId = await this.patientIdService.generatePatientId(
+        patientData.fullName,
+        patientData.birthDate,
+      );
+
+      // Create a new patient with the generated patientID
+      return await this.patientModel.create({
+        ...patientData,
+        patientID: patientId,
       });
-      // If patient with uniqueGovID already exists, throw an error
-      if (patient) {
-        this.logger.error(
-          `Patient with uniqueGovID: ${patientData.uniqueGovID} already exists`,
-        );
+    } catch (error) {
+      this.logger.error(`Failed to create patient`);
+      this.logger.error(error.message);
 
-        throw new BadRequestException(
-          `Patient with uniqueGovID: ${patientData.uniqueGovID} already exists`,
-        );
-      }
-      // Create a new patient
-      else {
-        try {
-          return await this.patientModel.create(patientData);
-        } catch (error) {
-          this.logger.error(`Failed to create patient`);
-          this.logger.error(error.message);
-
-          throw new InternalServerErrorException(`Failed to create patient`);
-        }
-      }
-    }
-    // Otherwise, create a new patient
-    else {
-      try {
-        return await this.patientModel.create(patientData);
-      } catch (error) {
-        this.logger.error(`Failed to create patient`);
-        this.logger.error(error.message);
-
-        throw new InternalServerErrorException(`Failed to create patient`);
-      }
+      throw new InternalServerErrorException(`Failed to create patient`);
     }
   }
 

@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Patient, PatientSchema } from 'src/db/models/patient.model';
 import { PatientIdService } from './patient-id.service';
 import { PatientId, PatientIdSchema } from 'src/db/models/patient-id.model';
-import { PatientIdController } from './patient-id.controller';
 
 @Module({
   imports: [
@@ -14,7 +13,7 @@ import { PatientIdController } from './patient-id.controller';
       { name: PatientId.name, schema: PatientIdSchema },
     ]),
   ],
-  controllers: [PatientController, PatientIdController],
+  controllers: [PatientController],
   providers: [PatientService, PatientIdService],
 })
 export class PatientModule {}

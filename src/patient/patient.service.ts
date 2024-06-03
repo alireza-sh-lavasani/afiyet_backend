@@ -8,7 +8,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { IPatient } from '@aafiat/common';
 import { Patient } from 'src/db/models/patient.model';
 import { Model } from 'mongoose';
-import { CreatePatientDto } from './dto/create-patient.dto';
+import {
+  CreatePatientDto,
+  CreatePatientTmpIdDto,
+} from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientIdService } from './patient-id.service';
 
@@ -28,7 +31,7 @@ export class PatientService {
   async createPatient(patientData: CreatePatientDto): Promise<IPatient> {
     try {
       // Generate a new patientId
-      const patientId = await this.patientIdService.getPatientId(
+      const patientId = await this.patientIdService.createPatientId(
         patientData.fullName,
         patientData.birthDate,
       );
@@ -36,13 +39,43 @@ export class PatientService {
       // Create a new patient with the generated patientId
       return await this.patientModel.create({
         ...patientData,
-        patientId,
+        patientId: patientId.id,
       });
     } catch (error) {
       this.logger.error(`Failed to create patient`);
       this.logger.error(error.message);
 
       throw new InternalServerErrorException(`Failed to create patient`);
+    }
+  }
+
+  /****************************************************
+   ******** Create Patient with Temp ID ***************
+   ****************************************************/
+  async createPatientWithTempId(
+    patientData: CreatePatientTmpIdDto,
+  ): Promise<IPatient> {
+    const { tmpPatientId } = patientData;
+
+    try {
+      // Generate a new patientId
+      const { id: patientId } =
+        await this.patientIdService.createPatientIdFromTempId(tmpPatientId);
+
+      // Create a new patient with the temporary patientId
+      return await this.patientModel.create({
+        patientId,
+        tmpPatientId,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to create patient with temp ID: ${patientData.tmpPatientId}`,
+      );
+      this.logger.error(error.message);
+
+      throw new InternalServerErrorException(
+        `Failed to create patient with temp ID: ${patientData.tmpPatientId}`,
+      );
     }
   }
 

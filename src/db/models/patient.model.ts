@@ -15,32 +15,35 @@ export class Patient implements IPatient {
   @Prop({ default: new Date().toISOString() })
   updatedAt: Date;
 
-  @Prop({ required: true, default: null })
+  @Prop()
   education: string;
 
-  @Prop({ required: true, default: null })
+  @Prop()
   emmergencyContact: string;
 
-  @Prop({ required: true, default: null })
+  @Prop()
   fullName: string;
 
-  @Prop({ required: true, default: null })
+  @Prop()
   gender: string;
 
-  @Prop({ required: true, default: null })
+  @Prop()
   maritalStatus: string;
 
-  @Prop({ default: null })
+  @Prop()
   uniqueGovID: string;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Examination', required: true })
+  @Prop({ type: [Types.ObjectId], ref: 'Examination' })
   examinations: Types.ObjectId[];
 
-  @Prop({ required: true, default: null, unique: true, index: true })
+  @Prop()
   birthDate: Date;
 
-  @Prop({ required: true, default: null })
+  @Prop({ default: null, unique: true, index: true })
   patientId: string;
+
+  @Prop()
+  tmpPatientId: string;
 }
 
 export const PatientSchema = SchemaFactory.createForClass(Patient);

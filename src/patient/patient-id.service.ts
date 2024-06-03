@@ -1,78 +1,85 @@
-import {
-  generatePatientId,
-  generateRandomSequenceNumber,
-  padNumber,
-} from '@aafiat/common';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { generatePatientIdInitials } from '@aafiat/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PatientId, PatientIdDocument } from 'src/db/models/patient-id.model';
 
 @Injectable()
 export class PatientIdService {
-  logger = new Logger(PatientIdService.name);
-
   constructor(
     @InjectModel(PatientId.name)
     private patientIdModel: Model<PatientIdDocument>,
   ) {}
 
-  // Main function to generate a unique patient ID
-  public async getPatientId(
+  /**************************************
+   ******** Create Patient ID ************
+   *************************************/
+  async createPatientId(
     fullName: string,
     birthDateIso: string,
-  ): Promise<string> {
-    try {
-      const { patientId, birthDatePart, sequenceNumber } = generatePatientId(
-        fullName,
-        birthDateIso,
-      );
+  ): Promise<PatientId> {
+    // Get patient id initials
+    const { namePart, dateKey } = generatePatientIdInitials(
+      fullName,
+      birthDateIso,
+    );
 
-      // Save the generated patient ID to the database
-      const newPatientId = new this.patientIdModel({
-        id: patientId,
-        dateKey: birthDatePart,
-        sequenceNumber,
-      });
-      await newPatientId.save();
+    // Find the last sequence number for the given namePart and dateKey
+    const lastPatientId = await this.patientIdModel
+      .findOne({ namePart, dateKey })
+      .sort({ sequenceNumber: -1 })
+      .exec();
 
-      return patientId;
-    } catch (error) {
-      this.logger.error(`Failed to generate patient ID`);
-      this.logger.error(error.message);
-      throw new InternalServerErrorException(`Failed to generate patient ID`);
-    }
+    // Determine the next sequence number
+    const nextSequenceNumber = lastPatientId
+      ? lastPatientId.sequenceNumber + 1
+      : 1000;
+
+    // Generate the unique patient ID
+    const id = `${namePart}${dateKey}${nextSequenceNumber}`;
+
+    // Create the new PatientId document
+    const newPatientId = new this.patientIdModel({
+      namePart,
+      dateKey,
+      id,
+      sequenceNumber: nextSequenceNumber,
+    });
+
+    // Save the new PatientId document to the database
+    return newPatientId.save();
   }
 
-  // Function to check and reassign patient IDs to avoid collisions
-  public async checkAndReassignPatientIds(
-    patientIds: string[],
-  ): Promise<string[]> {
-    try {
-      const reassignedIds = [];
+  /****************************************************
+   ******** Create Patient ID from Temp ID ************
+   ****************************************************/
+  async createPatientIdFromTempId(tmpPatientId: string): Promise<PatientId> {
+    const namePart = tmpPatientId.slice(0, 2); // Get the name part
+    const dateKey = tmpPatientId.slice(2, 10); // Get the date key
 
-      for (let id of patientIds) {
-        let exists = await this.patientIdModel.findOne({ id });
-        while (exists) {
-          const initials = id.slice(0, 2);
-          const birthDatePart = id.slice(2, 10);
-          const newSequenceNumber = generateRandomSequenceNumber(); // Generate a new random sequence number
-          const newSequenceNumberPadded = padNumber(newSequenceNumber, 4); // Pad the sequence number
-          id = `${initials}${birthDatePart}${newSequenceNumberPadded}`; // Construct a new patient ID
-          exists = await this.patientIdModel.findOne({ id }); // Check if the new ID already exists
-        }
-        reassignedIds.push(id); // Add the unique ID to the reassigned list
-      }
+    // Find the last sequence number for the given namePart and dateKey
+    const lastPatientId = await this.patientIdModel
+      .findOne({ namePart, dateKey })
+      .sort({ sequenceNumber: -1 })
+      .exec();
 
-      return reassignedIds;
-    } catch (error) {
-      this.logger.error(`Failed to reassign patient IDs`);
-      this.logger.error(error.message);
-      throw new InternalServerErrorException(`Failed to reassign patient IDs`);
-    }
+    // Determine the next sequence number
+    const nextSequenceNumber = lastPatientId
+      ? lastPatientId.sequenceNumber + 1
+      : 1000;
+
+    // Generate the unique patient ID
+    const id = `${namePart}${dateKey}${nextSequenceNumber}`;
+
+    // Create the new PatientId document
+    const newPatientId = new this.patientIdModel({
+      namePart,
+      dateKey,
+      id,
+      sequenceNumber: nextSequenceNumber,
+    });
+
+    // Save the new PatientId document to the database
+    return newPatientId.save();
   }
 }

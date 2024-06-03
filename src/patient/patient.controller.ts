@@ -12,6 +12,8 @@ import { PatientService } from './patient.service';
 import {
   CreatePatientDto,
   CreatePatientSchema,
+  CreatePatientTmpIdDto,
+  createPatientTmpIdSchema,
 } from './dto/create-patient.dto';
 import {
   UpdatePatientDto,
@@ -31,9 +33,20 @@ export class PatientController {
   @Post()
   async create(
     @Body(new ZodValidationPipe(CreatePatientSchema))
-    createPatientDto: CreatePatientDto,
+    body: CreatePatientDto,
   ): Promise<IPatient> {
-    return await this.patientService.createPatient(createPatientDto);
+    return await this.patientService.createPatient(body);
+  }
+
+  /****************************************************
+   ******** Create Patient with Temp ID ***************
+   ****************************************************/
+  @Post('/tmp-id')
+  async createWithTempId(
+    @Body(new ZodValidationPipe(createPatientTmpIdSchema))
+    body: CreatePatientTmpIdDto,
+  ): Promise<IPatient> {
+    return await this.patientService.createPatientWithTempId(body);
   }
 
   /**************************************

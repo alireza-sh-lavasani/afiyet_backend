@@ -5,6 +5,7 @@ import { PatientModule } from './patient/patient.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfigService } from './db/mongoose.config';
+import { SyncModule } from './sync/sync.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MongooseConfigService } from './db/mongoose.config';
     MongooseModule.forRootAsync({
       useClass: MongooseConfigService,
     }),
+    SyncModule,
   ],
   controllers: [AppController],
   providers: [AppService, MongooseConfigService],

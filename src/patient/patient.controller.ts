@@ -22,6 +22,7 @@ import {
 } from './dto/update-patient.dto';
 import { IPatient } from '@aafiat/common';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
+import { MongooseError } from 'mongoose';
 
 @Controller('patient')
 export class PatientController {
@@ -65,7 +66,9 @@ export class PatientController {
         updatePatientDto,
       );
     } catch (error) {
-      throw new NotFoundException(error.message);
+      if (error instanceof MongooseError)
+        throw new NotFoundException(error.message);
+      throw new NotFoundException(error);
     }
   }
 
@@ -77,7 +80,9 @@ export class PatientController {
     try {
       return await this.patientService.deletePatient(patientId);
     } catch (error) {
-      throw new NotFoundException(error.message);
+      if (error instanceof MongooseError)
+        throw new NotFoundException(error.message);
+      throw new NotFoundException(error);
     }
   }
 

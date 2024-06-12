@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { IPatient } from '@aafiat/common';
 import { Patient } from 'src/db/models/patient.model';
-import { Model } from 'mongoose';
+import { Model, MongooseError } from 'mongoose';
 import {
   CreatePatientDto,
   CreatePatientTmpIdDto,
@@ -43,7 +43,9 @@ export class PatientService {
       });
     } catch (error) {
       this.logger.error(`Failed to create patient`);
-      this.logger.error(error.message);
+
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
 
       throw new InternalServerErrorException(`Failed to create patient`);
     }
@@ -71,7 +73,9 @@ export class PatientService {
       this.logger.error(
         `Failed to create patient with temp ID: ${patientData.tmpPatientId}`,
       );
-      this.logger.error(error.message);
+
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
 
       throw new InternalServerErrorException(
         `Failed to create patient with temp ID: ${patientData.tmpPatientId}`,
@@ -129,7 +133,10 @@ export class PatientService {
       return patient;
     } catch (error) {
       this.logger.error(`Failed to get patient with id: ${id}`);
-      this.logger.error(error.message);
+
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
+
       throw error;
     }
   }

@@ -1,20 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { IPatient } from '@aafiat/common';
+import { Examination } from './examination.model';
 
 export type PatientDocument = HydratedDocument<Patient>;
 
 @Schema({ timestamps: true })
 export class Patient implements IPatient {
-  @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
-  _id: Types.ObjectId;
-
-  @Prop({ default: new Date().toISOString() })
-  createdAt: Date;
-
-  @Prop({ default: new Date().toISOString() })
-  updatedAt: Date;
-
   @Prop()
   education: string;
 
@@ -33,8 +25,8 @@ export class Patient implements IPatient {
   @Prop()
   uniqueGovID: string;
 
-  @Prop({ type: [Types.ObjectId], ref: 'Examination' })
-  examinations: Types.ObjectId[];
+  @Prop({ type: [{ type: [Types.ObjectId], ref: 'Examination' }] })
+  examinations: Examination[];
 
   @Prop()
   birthDate: Date;

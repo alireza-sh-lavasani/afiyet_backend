@@ -7,6 +7,8 @@ import {
   Param,
   Body,
   NotFoundException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import {
@@ -23,6 +25,13 @@ import {
 import { IPatient } from '@aafiat/common';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { MongooseError } from 'mongoose';
+import {
+  CreateExaminationBody,
+  CreateExaminationDto,
+} from './dto/create-examination.dto';
+import { PatientExistsGuard } from './guards/patient-exists.guard';
+import { IRequestWithPatient } from './interfaces/request-with-patient.interface';
+import { PatientDocument } from 'src/db/models/patient.model';
 
 @Controller('patient')
 export class PatientController {
@@ -100,5 +109,21 @@ export class PatientController {
   @Get(':patientId')
   async findOne(@Param('patientId') patientId: string): Promise<IPatient> {
     return await this.patientService.getPatientById(patientId);
+  }
+
+  /**************************************
+   ******** Create New Examination ******
+   *************************************/
+  @Post(':patientId/examination')
+  @UseGuards(PatientExistsGuard)
+  async createExamination(
+    @Body(new ZodValidationPipe(CreateExaminationBody))
+    body: CreateExaminationDto,
+    @Req() req: IRequestWithPatient,
+  ): Promise<PatientDocument> {
+    return await this.patientService.createExamination({
+      patient: req.patient,
+      examinationData: body,
+    });
   }
 }

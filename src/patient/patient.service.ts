@@ -5,8 +5,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { IPatient } from '@aafiat/common';
-import { Patient } from 'src/db/models/patient.model';
+import { IPatient, IExamination } from '@aafiat/common';
+import { Patient, PatientDocument } from 'src/db/models/patient.model';
 import { Model, MongooseError } from 'mongoose';
 import {
   CreatePatientDto,
@@ -14,6 +14,8 @@ import {
 } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientIdService } from './patient-id.service';
+import { Examination } from 'src/db/models/examination.model';
+import { ICreaetExamination } from './interfaces/create-examination.interface';
 
 @Injectable()
 export class PatientService {
@@ -22,6 +24,8 @@ export class PatientService {
   constructor(
     @InjectModel(Patient.name)
     private readonly patientModel: Model<IPatient>,
+    @InjectModel(Examination.name)
+    private readonly examinationModel: Model<IExamination>,
     private readonly patientIdService: PatientIdService,
   ) {}
 
@@ -116,23 +120,65 @@ export class PatientService {
   /**************************************
    ******** Get All Patients ***************
    *************************************/
-  async getAllPatients(): Promise<IPatient[]> {
-    return await this.patientModel.find().exec();
+  async getAllPatients(): Promise<PatientDocument[]> {
+    return (await this.patientModel.find().exec()) as PatientDocument[];
   }
 
   /**************************************
    ******** Get Patient By ID ***************
    *************************************/
-  async getPatientById(id: string): Promise<IPatient> {
+  async getPatientById(patientId: string): Promise<PatientDocument> {
     try {
-      const patient = await this.patientModel.findById(id).exec();
+      const patient = (await this.patientModel
+        .findOne({ patientId })
+        .exec()) as PatientDocument;
       if (!patient) {
-        throw new BadRequestException(`Patient with id: ${id} not found`);
+        throw new BadRequestException(
+          `Patient with patientId: ${patientId} not found`,
+        );
       }
 
       return patient;
     } catch (error) {
-      this.logger.error(`Failed to get patient with id: ${id}`);
+      this.logger.error(`Failed to get patient with patientId: ${patientId}`);
+
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
+
+      throw error;
+    }
+  }
+
+  /**************************************
+   ******** Create New Examination ******
+   *************************************/
+  async createExamination({
+    examinationData,
+    patientId,
+    patient,
+  }: ICreaetExamination): Promise<PatientDocument> {
+    try {
+      const newExamination =
+        await this.examinationModel.create(examinationData); // Create a new examination
+
+      // If patient is not provided, get the patient by patientId and add the new examination
+      if (!patient) {
+        const patient = await this.getPatientById(patientId);
+        patient.examinations.push(newExamination);
+        await patient.save();
+
+        return patient;
+      }
+
+      // Add the new examination to the patient's examinations array
+      patient.examinations.push(newExamination);
+      await patient.save();
+
+      return patient;
+    } catch (error) {
+      this.logger.error(
+        `Failed to create examination for patient: ${patient.patientId}`,
+      );
 
       if (error instanceof MongooseError) this.logger.error(error.message);
       else this.logger.error(error);

@@ -12,7 +12,7 @@ import pako from 'pako';
 export class SyncController {
   constructor(private readonly syncService: SyncService) {}
 
-  @Post()
+  @Post('/buffer')
   async sync(@Req() req: Request, @Res() res: Response) {
     try {
       // Collect the incoming data as a buffer

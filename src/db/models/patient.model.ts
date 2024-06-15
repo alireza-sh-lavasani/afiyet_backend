@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { IPatient } from '@aafiat/common';
-import { Examination } from './examination.model';
+// import { Examination } from './examination.model';
 
 export type PatientDocument = HydratedDocument<Patient>;
 
@@ -25,8 +25,8 @@ export class Patient implements IPatient {
   @Prop()
   uniqueGovID: string;
 
-  @Prop({ type: [{ type: [Types.ObjectId], ref: 'Examination' }] })
-  examinations: Examination[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Examination' }] })
+  examinations: Types.ObjectId[];
 
   @Prop()
   birthDate: Date;

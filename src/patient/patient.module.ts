@@ -20,5 +20,6 @@ import {
   ],
   controllers: [PatientController],
   providers: [PatientService, PatientIdService],
+  exports: [PatientService],
 })
 export class PatientModule {}

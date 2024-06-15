@@ -8,6 +8,7 @@ import {
 import { SyncService } from './sync.service';
 import { Request, Response } from 'express';
 import pako from 'pako';
+import { ISyncBaseDto } from '@aafiat/common';
 @Controller('sync')
 export class SyncController {
   constructor(private readonly syncService: SyncService) {}
@@ -19,7 +20,7 @@ export class SyncController {
       const chunks: Buffer[] = [];
       req.on('data', (chunk) => chunks.push(chunk));
 
-      req.on('end', () => {
+      req.on('end', async () => {
         // Combine all chunks into a single buffer
         const compressedBuffer = Buffer.concat(chunks);
 
@@ -31,13 +32,15 @@ export class SyncController {
         // Parse the decompressed data back to JSON
         const originalData = JSON.parse(decompressedData);
 
-        console.log('Received and decompressed data:', originalData);
+        await this.syncService.syncTabletToServer(
+          originalData as ISyncBaseDto[],
+        );
 
-        res.send('Data received and decompressed successfully');
+        return res.send('Data received and decompressed successfully');
       });
     } catch (error) {
-      console.error('Error decompressing data:', error);
-      throw new InternalServerErrorException('Error decompressing data');
+      console.error('Error syncing data:', error);
+      throw new InternalServerErrorException('Error syncing data');
     }
   }
 }

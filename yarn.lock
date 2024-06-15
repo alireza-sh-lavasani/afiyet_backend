@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aafiat/common@":
-  version "2.0.0"
-  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-2.0.0.tgz#6c7e0c987cf77c293b44e446940e9bbf7c38f8f4"
-  integrity sha1-bH4MmHz3fCk7RORGlA6bv3w4+PQ=
+"@aafiat/common@*":
+  version "2.6.2"
+  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-2.6.2.tgz#9d5905e3b5ca51108a574f4c55b8eb93198fb47a"
+  integrity sha1-nVkF47XKURCKV09MVbjrkxmPtHo=
   dependencies:
     moment "^2.30.1"
 

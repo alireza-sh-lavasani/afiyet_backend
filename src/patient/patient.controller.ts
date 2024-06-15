@@ -14,7 +14,6 @@ import { PatientService } from './patient.service';
 import {
   CreatePatientDto,
   CreatePatientSchema,
-  CreatePatientTmpIdDto,
   createPatientTmpIdSchema,
 } from './dto/create-patient.dto';
 import {
@@ -30,8 +29,8 @@ import {
   CreateExaminationDto,
 } from './dto/create-examination.dto';
 import { PatientExistsGuard } from './guards/patient-exists.guard';
-import { IRequestWithPatient } from './interfaces/request-with-patient.interface';
 import { PatientDocument } from 'src/db/models/patient.model';
+import { IRequestWithPatient } from './patient.interfaces';
 
 @Controller('patient')
 export class PatientController {
@@ -54,7 +53,7 @@ export class PatientController {
   @Post('/tmp-id')
   async createWithTempId(
     @Body(new ZodValidationPipe(createPatientTmpIdSchema))
-    body: CreatePatientTmpIdDto,
+    body: IPatient,
   ): Promise<IPatient> {
     return await this.patientService.createPatientWithTempId(body);
   }
@@ -108,7 +107,10 @@ export class PatientController {
    *************************************/
   @Get(':patientId')
   async findOne(@Param('patientId') patientId: string): Promise<IPatient> {
-    return await this.patientService.getPatientById(patientId);
+    return await this.patientService.getPatientById({
+      patientId,
+      populate: true,
+    });
   }
 
   /**************************************

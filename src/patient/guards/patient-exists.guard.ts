@@ -18,7 +18,7 @@ export class PatientExistsGuard implements CanActivate {
       throw new BadRequestException('Patient ID is missing');
     }
 
-    const patient = await this.patientService.getPatientById(patientId);
+    const patient = await this.patientService.getPatientById({ patientId });
 
     request.patient = patient;
 

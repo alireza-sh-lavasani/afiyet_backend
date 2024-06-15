@@ -15,10 +15,14 @@ export class MongooseConfigService implements MongooseOptionsFactory {
   createMongooseOptions(): MongooseModuleOptions {
     const uri = this.configService.get<string>('MONGODB_URI');
     const dbName = this.configService.get<string>('MONGODB_DB_NAME');
+    const user = this.configService.get<string>('MONGODB_USER');
+    const pass = this.configService.get<string>('MONGODB_PASSWORD');
 
     return {
       uri,
       dbName,
+      user,
+      pass,
       autoIndex: false,
       retryWrites: true,
       w: 'majority',

@@ -8,14 +8,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { IPatient, IExamination } from '@aafiat/common';
 import { Patient, PatientDocument } from 'src/db/models/patient.model';
 import { Model, MongooseError } from 'mongoose';
-import {
-  CreatePatientDto,
-  CreatePatientTmpIdDto,
-} from './dto/create-patient.dto';
+import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientIdService } from './patient-id.service';
 import { Examination } from 'src/db/models/examination.model';
-import { ICreaetExamination } from './interfaces/create-examination.interface';
+import { ICreateExamination, IGetPatientById } from './patient.interfaces';
 
 @Injectable()
 export class PatientService {
@@ -58,21 +55,28 @@ export class PatientService {
   /****************************************************
    ******** Create Patient with Temp ID ***************
    ****************************************************/
-  async createPatientWithTempId(
-    patientData: CreatePatientTmpIdDto,
-  ): Promise<IPatient> {
+  async createPatientWithTempId(patientData: IPatient): Promise<IPatient> {
     const { tmpPatientId } = patientData;
 
     try {
-      // Generate a new patientId
-      const { id: patientId } =
-        await this.patientIdService.createPatientIdFromTempId(tmpPatientId);
+      // Check if patient with temp ID already exists
+      const patient = await this.patientModel.findOne({ tmpPatientId }).exec();
 
-      // Create a new patient with the temporary patientId
-      return await this.patientModel.create({
-        patientId,
-        tmpPatientId,
-      });
+      if (patient) {
+        this.logger.log(`Patient with temp ID: ${tmpPatientId} already exists`);
+        return patient;
+      }
+      // Generate a new patientId from the temp ID
+      else {
+        const { id: patientId } =
+          await this.patientIdService.createPatientIdFromTempId(tmpPatientId);
+
+        // Create a new patient
+        return await this.patientModel.create({
+          ...patientData,
+          patientId,
+        });
+      }
     } catch (error) {
       this.logger.error(
         `Failed to create patient with temp ID: ${patientData.tmpPatientId}`,
@@ -127,11 +131,24 @@ export class PatientService {
   /**************************************
    ******** Get Patient By ID ***************
    *************************************/
-  async getPatientById(patientId: string): Promise<PatientDocument> {
+  async getPatientById({
+    patientId,
+    populate = false,
+  }: IGetPatientById): Promise<PatientDocument> {
     try {
-      const patient = (await this.patientModel
-        .findOne({ patientId })
-        .exec()) as PatientDocument;
+      let patient: PatientDocument;
+
+      if (populate) {
+        patient = (await this.patientModel
+          .findOne({ patientId })
+          .populate('examinations')
+          .exec()) as PatientDocument;
+      } else {
+        patient = (await this.patientModel
+          .findOne({ patientId })
+          .exec()) as PatientDocument;
+      }
+
       if (!patient) {
         throw new BadRequestException(
           `Patient with patientId: ${patientId} not found`,
@@ -149,6 +166,34 @@ export class PatientService {
     }
   }
 
+  /***********************************************
+   ******** Get Patient By Temp ID ***************
+   **********************************************/
+  async getPatientByTempId(tmpPatientId: string): Promise<PatientDocument> {
+    try {
+      const patient = (await this.patientModel
+        .findOne({ tmpPatientId })
+        .exec()) as PatientDocument;
+
+      if (!patient) {
+        throw new BadRequestException(
+          `Patient with tmpPatientId: ${tmpPatientId} not found`,
+        );
+      }
+
+      return patient;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get patient with tmpPatientId: ${tmpPatientId}`,
+      );
+
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
+
+      throw error;
+    }
+  }
+
   /**************************************
    ******** Create New Examination ******
    *************************************/
@@ -156,25 +201,22 @@ export class PatientService {
     examinationData,
     patientId,
     patient,
-  }: ICreaetExamination): Promise<PatientDocument> {
+  }: ICreateExamination): Promise<PatientDocument> {
     try {
+      // Create a new examination
       const newExamination =
-        await this.examinationModel.create(examinationData); // Create a new examination
+        await this.examinationModel.create(examinationData);
 
       // If patient is not provided, get the patient by patientId and add the new examination
       if (!patient) {
-        const patient = await this.getPatientById(patientId);
-        patient.examinations.push(newExamination);
-        await patient.save();
-
-        return patient;
+        const patient = await this.getPatientById({ patientId });
+        patient.examinations.push(newExamination._id);
+        return await patient.save();
       }
 
       // Add the new examination to the patient's examinations array
-      patient.examinations.push(newExamination);
-      await patient.save();
-
-      return patient;
+      patient.examinations.push(newExamination._id);
+      return await patient.save();
     } catch (error) {
       this.logger.error(
         `Failed to create examination for patient: ${patient.patientId}`,

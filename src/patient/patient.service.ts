@@ -60,7 +60,7 @@ export class PatientService {
 
     try {
       // Check if patient with temp ID already exists
-      const patient = await this.patientModel.findOne({ tmpPatientId }).exec();
+      const patient = await this.getPatientByTempId(tmpPatientId);
 
       if (patient) {
         this.logger.log(`Patient with temp ID: ${tmpPatientId} already exists`);
@@ -176,17 +176,12 @@ export class PatientService {
         .exec()) as PatientDocument;
 
       if (!patient) {
-        throw new BadRequestException(
-          `Patient with tmpPatientId: ${tmpPatientId} not found`,
-        );
+        this.logger.log(`Patient with tmpPatientId: ${tmpPatientId} not found`);
+        return null;
       }
 
       return patient;
     } catch (error) {
-      this.logger.error(
-        `Failed to get patient with tmpPatientId: ${tmpPatientId}`,
-      );
-
       if (error instanceof MongooseError) this.logger.error(error.message);
       else this.logger.error(error);
 

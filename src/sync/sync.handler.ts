@@ -46,11 +46,13 @@ export class SyncHandler {
           const patient =
             await this.patientService.getPatientByTempId(patientId);
 
-          // Create the examination using the fetched patient
-          await this.patientService.createExamination({
-            patient,
-            examinationData: JSON.parse(data as unknown as string),
-          });
+          if (patient) {
+            // Create the examination using the fetched patient
+            await this.patientService.createExamination({
+              patient,
+              examinationData: JSON.parse(data as unknown as string),
+            });
+          }
       }
 
       this.logger.log('Examination created successfully');

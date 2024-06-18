@@ -6,21 +6,25 @@ import {
   ISyncCreateExaminationDto,
 } from '@aafiat/common';
 import { SyncHandler } from './sync.handler';
+import { PatientService } from 'src/patient/patient.service';
 
 @Injectable()
 export class SyncService {
   logger = new Logger(SyncService.name);
 
-  constructor(private readonly syncHandler: SyncHandler) {}
+  constructor(
+    private readonly syncHandler: SyncHandler,
+    private readonly patientService: PatientService,
+  ) {}
 
   /**************************************
    ******** Sync Tablet to Server ********
    *************************************/
   async syncTabletToServer(syncData: ISyncBaseDto[]) {
-    for (const syncRecord of syncData) {
-      const { entity } = syncRecord;
+    try {
+      for (const syncRecord of syncData) {
+        const { entity } = syncRecord;
 
-      try {
         switch (entity) {
           // Handle patient sync
           case ESyncEntity.PATIENT:
@@ -34,16 +38,26 @@ export class SyncService {
             );
             break;
         }
-      } catch (error) {
-        throw error;
       }
+    } catch (error) {
+      throw error;
     }
   }
 
   /**************************************
    ******** Sync Server to Tablet ********
    *************************************/
-  async syncServerToTablet() {}
+  async syncServerToTablet() {
+    const patientsPromise = this.patientService.getAllPatients();
+    const examinationsPromise = this.patientService.getAllExaminations();
+
+    const [patients, examinations] = await Promise.all([
+      patientsPromise,
+      examinationsPromise,
+    ]);
+
+    return { patients, examinations };
+  }
 
   /**************************************
    ******** Handle Patient Sync ********

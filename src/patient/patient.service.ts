@@ -124,8 +124,8 @@ export class PatientService {
   /**************************************
    ******** Get All Patients ***************
    *************************************/
-  async getAllPatients(): Promise<PatientDocument[]> {
-    return (await this.patientModel.find().exec()) as PatientDocument[];
+  async getAllPatients(): Promise<IPatient[]> {
+    return await this.patientModel.find().lean();
   }
 
   /**************************************
@@ -222,5 +222,12 @@ export class PatientService {
 
       throw error;
     }
+  }
+
+  /**************************************
+   ******** Get all examinations
+   *************************************/
+  async getAllExaminations(): Promise<IExamination> {
+    return await this.examinationModel.find().lean();
   }
 }

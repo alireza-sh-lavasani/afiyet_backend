@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   InternalServerErrorException,
   Post,
   Req,
@@ -47,5 +48,10 @@ export class SyncController {
       console.error('Error syncing data:', error);
       throw new InternalServerErrorException('Error syncing data');
     }
+  }
+
+  @Get('/latest-data')
+  async getLatestData() {
+    return await this.syncService.syncServerToTablet();
   }
 }

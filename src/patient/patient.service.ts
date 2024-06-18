@@ -131,7 +131,10 @@ export class PatientService {
    ******** Get All Patients ***************
    *************************************/
   async getAllPatients(): Promise<IPatient[]> {
-    return await this.patientModel.find().lean();
+    return await this.patientModel
+      .find()
+      .select('-_id -createdAt -updatedAt -__v')
+      .lean();
   }
 
   /**************************************
@@ -234,7 +237,10 @@ export class PatientService {
    ******** Get all examinations
    *************************************/
   async getAllExaminations(): Promise<IExamination[]> {
-    return await this.examinationModel.find().lean();
+    return await this.examinationModel
+      .find()
+      .select('-_id -createdAt -updatedAt -__v')
+      .lean();
   }
 
   /**************************************

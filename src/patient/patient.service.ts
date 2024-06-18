@@ -72,10 +72,16 @@ export class PatientService {
           await this.patientIdService.createPatientIdFromTempId(tmpPatientId);
 
         // Create a new patient
-        return await this.patientModel.create({
+        const patient = await this.patientModel.create({
           ...patientData,
           patientId,
         });
+
+        this.logger.log(
+          `Patient with temp ID: ${patientData.tmpPatientId} created successfully.`,
+        );
+
+        return patient;
       }
     } catch (error) {
       this.logger.error(
@@ -227,7 +233,21 @@ export class PatientService {
   /**************************************
    ******** Get all examinations
    *************************************/
-  async getAllExaminations(): Promise<IExamination> {
+  async getAllExaminations(): Promise<IExamination[]> {
     return await this.examinationModel.find().lean();
+  }
+
+  /**************************************
+   ******** Get examination by id
+   *************************************/
+  async getExaminationById(examinationId: string): Promise<IExamination> {
+    try {
+      return await this.examinationModel.findOne({ examinationId }).lean();
+    } catch (error) {
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
+
+      throw error;
+    }
   }
 }

@@ -1,11 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { IExamination } from '@aafiat/common';
+import { v4 as uuidv4 } from 'uuid';
 
 export type ExaminationDocument = Document & Examination;
 
 @Schema({ timestamps: true })
 export class Examination implements IExamination {
+  @Prop({ required: true, default: uuidv4() })
+  examinationId: string;
+
   @Prop({ required: true, default: '' })
   zoba: string;
 

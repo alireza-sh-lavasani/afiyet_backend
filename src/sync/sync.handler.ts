@@ -17,11 +17,9 @@ export class SyncHandler {
    ********************************************/
   async handlePatientCreateSync(data: ISyncCreatePatientData) {
     try {
-      await this.patientService.createPatientWithTempId(data);
-
-      this.logger.log('Patient created successfully');
+      return await this.patientService.createPatientWithTempId(data);
     } catch (error) {
-      this.logger.error('Error creating patient:', error);
+      this.logger.error('Error syncing patient:', error);
       throw error;
     }
   }
@@ -32,13 +30,26 @@ export class SyncHandler {
   async handleExaminationCreateSync(syncData: ISyncCreateExaminationDto) {
     const { data, metaData } = syncData;
     const { patientId, idType } = JSON.parse(metaData as unknown as string);
+    const examinationData = JSON.parse(data as unknown as string);
 
     try {
+      // Check if examination already exist
+      const existingExamination = await this.patientService.getExaminationById(
+        examinationData.examinationId,
+      );
+
+      if (existingExamination) {
+        this.logger.log(
+          `Examination with ID: ${examinationData.examinationId} already exists`,
+        );
+        return existingExamination;
+      }
+
       switch (idType) {
         case EIdType.PERMANENT:
           await this.patientService.createExamination({
             patientId,
-            examinationData: JSON.parse(data as unknown as string),
+            examinationData,
           });
           break;
         case EIdType.TEMP:
@@ -50,14 +61,12 @@ export class SyncHandler {
             // Create the examination using the fetched patient
             await this.patientService.createExamination({
               patient,
-              examinationData: JSON.parse(data as unknown as string),
+              examinationData,
             });
           }
       }
-
-      this.logger.log('Examination created successfully');
     } catch (error) {
-      this.logger.error('Error creating examination:', error);
+      this.logger.error('Error syncing examination:', error);
       throw error;
     }
   }

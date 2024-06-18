@@ -3,9 +3,9 @@
 
 
 "@aafiat/common@*":
-  version "2.6.2"
-  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-2.6.2.tgz#9d5905e3b5ca51108a574f4c55b8eb93198fb47a"
-  integrity sha1-nVkF47XKURCKV09MVbjrkxmPtHo=
+  version "2.6.4"
+  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-2.6.4.tgz#ddfbcb169d8224872c98d7224a66e228f736c763"
+  integrity sha1-3fvLFp2CJIcsmNciSmbiKPc2x2M=
   dependencies:
     moment "^2.30.1"
 
@@ -4913,6 +4913,11 @@ uuid@9.0.1:
   version "9.0.1"
   resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha1-4YjUyIU8xyIiA5LEJM1jfzIpPzA=
+
+uuid@^10.0.0:
+  version "10.0.0"
+  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
+  integrity sha1-WpWqRU5uACclx5BV/UKqujDKYpQ=
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

@@ -214,12 +214,12 @@ export class PatientService {
       // If patient is not provided, get the patient by patientId and add the new examination
       if (!patient) {
         const patient = await this.getPatientById({ patientId });
-        patient.examinations.push(newExamination._id);
+        patient.examinations.push(newExamination.examinationId);
         return await patient.save();
       }
 
       // Add the new examination to the patient's examinations array
-      patient.examinations.push(newExamination._id);
+      patient.examinations.push(newExamination.examinationId);
       return await patient.save();
     } catch (error) {
       this.logger.error(

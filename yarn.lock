@@ -3,9 +3,9 @@
 
 
 "@aafiat/common@*":
-  version "2.6.4"
-  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-2.6.4.tgz#ddfbcb169d8224872c98d7224a66e228f736c763"
-  integrity sha1-3fvLFp2CJIcsmNciSmbiKPc2x2M=
+  version "2.7.0"
+  resolved "https://pkgs.dev.azure.com/alirezashlavasani/aafiat/_packaging/aafiat-feed/npm/registry/@aafiat/common/-/common-2.7.0.tgz#3204eadb6731d609da8c138c79b50c03cbfd87fe"
+  integrity sha1-MgTq22cx1gnajBOMebUMA8v9h/4=
   dependencies:
     moment "^2.30.1"
 

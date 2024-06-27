@@ -149,12 +149,12 @@ export class PatientService {
 
       if (populate) {
         patient = (await this.patientModel
-          .findOne({ patientId })
-          .populate('examinations')
+          .findOne({ $or: [{ patientId }, { tmpPatientId: patientId }] })
+          .populate('examinations') // TODO Not working because of the model, but keeping it to remember for future
           .exec()) as PatientDocument;
       } else {
         patient = (await this.patientModel
-          .findOne({ patientId })
+          .findOne({ $or: [{ patientId }, { tmpPatientId: patientId }] })
           .exec()) as PatientDocument;
       }
 

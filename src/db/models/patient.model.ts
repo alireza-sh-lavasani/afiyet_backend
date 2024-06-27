@@ -25,7 +25,7 @@ export class Patient implements IPatient {
   @Prop()
   uniqueGovID: string;
 
-  @Prop({ type: [{ type: String, ref: 'Examination' }] })
+  @Prop({ type: [{ type: String }] })
   examinations: string[];
 
   @Prop()

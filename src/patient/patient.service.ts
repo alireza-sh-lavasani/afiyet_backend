@@ -256,4 +256,26 @@ export class PatientService {
       throw error;
     }
   }
+
+  /**************************************
+   ******** Get all patient examinations
+   *************************************/
+  async getAllPatientExaminations(patient: IPatient): Promise<IExamination[]> {
+    try {
+      const examinationPromises: Promise<IExamination>[] = [];
+
+      patient.examinations.forEach(async (examinationId) => {
+        examinationPromises.push(this.getExaminationById(examinationId));
+      });
+
+      const examinations = await Promise.all(examinationPromises);
+
+      return examinations;
+    } catch (error) {
+      if (error instanceof MongooseError) this.logger.error(error.message);
+      else this.logger.error(error);
+
+      throw error;
+    }
+  }
 }

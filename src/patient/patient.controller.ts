@@ -128,4 +128,13 @@ export class PatientController {
       examinationData: body,
     });
   }
+
+  /**************************************
+   ******** Get All Examinations of Patient
+   *************************************/
+  @Get(':patientId/examination')
+  @UseGuards(PatientExistsGuard)
+  async getAllPatientExaminations(@Req() req: IRequestWithPatient) {
+    return await this.patientService.getAllPatientExaminations(req.patient);
+  }
 }

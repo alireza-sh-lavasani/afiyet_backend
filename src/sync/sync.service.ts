@@ -7,6 +7,7 @@ import {
 } from '@aafiat/common';
 import { SyncHandler } from './sync.handler';
 import { PatientService } from 'src/patient/patient.service';
+import { ExaminationService } from 'src/examination/examination.service';
 
 @Injectable()
 export class SyncService {
@@ -15,6 +16,7 @@ export class SyncService {
   constructor(
     private readonly syncHandler: SyncHandler,
     private readonly patientService: PatientService,
+    private readonly examinationService: ExaminationService,
   ) {}
 
   /**************************************
@@ -49,7 +51,7 @@ export class SyncService {
    *************************************/
   async syncServerToTablet() {
     const patientsPromise = this.patientService.getAllPatients();
-    const examinationsPromise = this.patientService.getAllExaminations();
+    const examinationsPromise = this.examinationService.getAllExaminations();
 
     const [patients, examinations] = await Promise.all([
       patientsPromise,

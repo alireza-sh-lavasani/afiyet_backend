@@ -5,12 +5,16 @@ import {
   EIdType,
 } from '@aafiat/common';
 import { PatientService } from 'src/patient/patient.service';
+import { ExaminationService } from 'src/examination/examination.service';
 
 @Injectable()
 export class SyncHandler {
   logger = new Logger(SyncHandler.name);
 
-  constructor(private readonly patientService: PatientService) {}
+  constructor(
+    private readonly patientService: PatientService,
+    private readonly examinationService: ExaminationService,
+  ) {}
 
   /********************************************
    ******** Handle Patient Create Sync ********
@@ -34,9 +38,10 @@ export class SyncHandler {
 
     try {
       // Check if examination already exist
-      const existingExamination = await this.patientService.getExaminationById(
-        examinationData.examinationId,
-      );
+      const existingExamination =
+        await this.examinationService.getExaminationById(
+          examinationData.examinationId,
+        );
 
       if (existingExamination) {
         this.logger.log(

@@ -13,6 +13,7 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientIdService } from './patient-id.service';
 import { Examination } from 'src/db/models/examination.model';
 import { ICreateExamination, IGetPatientById } from './patient.interfaces';
+import { ExaminationService } from 'src/examination/examination.service';
 
 @Injectable()
 export class PatientService {
@@ -24,6 +25,7 @@ export class PatientService {
     @InjectModel(Examination.name)
     private readonly examinationModel: Model<IExamination>,
     private readonly patientIdService: PatientIdService,
+    private readonly examinationService: ExaminationService,
   ) {}
 
   /**************************************
@@ -234,30 +236,6 @@ export class PatientService {
   }
 
   /**************************************
-   ******** Get all examinations
-   *************************************/
-  async getAllExaminations(): Promise<IExamination[]> {
-    return await this.examinationModel
-      .find()
-      .select('-_id -createdAt -updatedAt -__v')
-      .lean();
-  }
-
-  /**************************************
-   ******** Get examination by id
-   *************************************/
-  async getExaminationById(examinationId: string): Promise<IExamination> {
-    try {
-      return await this.examinationModel.findOne({ examinationId }).lean();
-    } catch (error) {
-      if (error instanceof MongooseError) this.logger.error(error.message);
-      else this.logger.error(error);
-
-      throw error;
-    }
-  }
-
-  /**************************************
    ******** Get all patient examinations
    *************************************/
   async getAllPatientExaminations(patient: IPatient): Promise<IExamination[]> {
@@ -265,7 +243,9 @@ export class PatientService {
       const examinationPromises: Promise<IExamination>[] = [];
 
       patient.examinations.forEach(async (examinationId) => {
-        examinationPromises.push(this.getExaminationById(examinationId));
+        examinationPromises.push(
+          this.examinationService.getExaminationById(examinationId),
+        );
       });
 
       const examinations = await Promise.all(examinationPromises);

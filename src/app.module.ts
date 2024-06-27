@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfigService } from './db/mongoose.config';
 import { SyncModule } from './sync/sync.module';
+import { ExaminationModule } from './examination/examination.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SyncModule } from './sync/sync.module';
       useClass: MongooseConfigService,
     }),
     SyncModule,
+    ExaminationModule,
   ],
   controllers: [AppController],
   providers: [AppService, MongooseConfigService],

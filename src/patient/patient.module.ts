@@ -9,6 +9,7 @@ import {
   Examination,
   ExaminationSchema,
 } from 'src/db/models/examination.model';
+import { ExaminationModule } from 'src/examination/examination.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import {
       { name: PatientId.name, schema: PatientIdSchema },
       { name: Examination.name, schema: ExaminationSchema },
     ]),
+    ExaminationModule,
   ],
   controllers: [PatientController],
   providers: [PatientService, PatientIdService],

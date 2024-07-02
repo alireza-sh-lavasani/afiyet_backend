@@ -10,10 +10,10 @@ export class Examination implements IExamination {
   @Prop({ required: true, default: uuidv4() })
   examinationId: string;
 
-  @Prop({ required: true, default: '' })
+  @Prop({ required: false, default: '' })
   zoba: string;
 
-  @Prop({ required: true, default: '' })
+  @Prop({ required: false, default: '' })
   subZoba: string;
 
   @Prop({ required: true, default: '' })

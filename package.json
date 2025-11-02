@@ -21,7 +21,7 @@
     "setup:artifacts": "node node_modules/@microsoft/artifact-credential-provider/install.js"
   },
   "dependencies": {
-    "@aafiat/common": "*",
+    "@alireza-lavasani/afiyet-common": "^3.0.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",
     "@nestjs/core": "^10.0.0",

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { IExamination } from '@aafiat/common';
+import { IExamination } from '@alireza-lavasani/afiyet-common';
 import { v4 as uuidv4 } from 'uuid';
 
 export type ExaminationDocument = Document & Examination;

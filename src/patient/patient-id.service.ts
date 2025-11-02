@@ -1,4 +1,4 @@
-import { generatePatientIdInitials } from '@aafiat/common';
+import { generatePatientIdInitials } from '@alireza-lavasani/afiyet-common';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';

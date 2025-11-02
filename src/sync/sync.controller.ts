@@ -9,7 +9,7 @@ import {
 import { SyncService } from './sync.service';
 import { Request, Response } from 'express';
 import pako from 'pako';
-import { ISyncBaseDto } from '@aafiat/common';
+import { ISyncBaseDto } from '@alireza-lavasani/afiyet-common';
 @Controller('sync')
 export class SyncController {
   constructor(private readonly syncService: SyncService) {}

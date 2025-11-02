@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { IPatient, IExamination } from '@aafiat/common';
+import { IPatient, IExamination } from '@alireza-lavasani/afiyet-common';
 import { Patient, PatientDocument } from 'src/db/models/patient.model';
 import { Model, MongooseError } from 'mongoose';
 import { CreatePatientDto } from './dto/create-patient.dto';

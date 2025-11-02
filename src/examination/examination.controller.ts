@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ExaminationService } from './examination.service';
-import { IExamination } from '@aafiat/common';
+import { IExamination } from '@alireza-lavasani/afiyet-common';
 
 @Controller('examination')
 export class ExaminationController {

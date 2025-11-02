@@ -3,7 +3,7 @@ import {
   ISyncCreatePatientData,
   ISyncCreateExaminationDto,
   EIdType,
-} from '@aafiat/common';
+} from '@alireza-lavasani/afiyet-common';
 import { PatientService } from 'src/patient/patient.service';
 import { ExaminationService } from 'src/examination/examination.service';
 

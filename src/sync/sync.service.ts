@@ -4,7 +4,7 @@ import {
   ESyncEntity,
   ESyncOperation,
   ISyncCreateExaminationDto,
-} from '@aafiat/common';
+} from '@alireza-lavasani/afiyet-common';
 import { SyncHandler } from './sync.handler';
 import { PatientService } from 'src/patient/patient.service';
 import { ExaminationService } from 'src/examination/examination.service';

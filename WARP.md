@@ -82,7 +82,7 @@ The sync system supports bidirectional data flow:
 
 ### Dependencies
 - **MongoDB**: Primary database using Mongoose ODM
-- **@aafiat/common**: Shared types and interfaces across the application
+- **@alireza-lavasani/afiyet-common**: Shared types and interfaces across the application
 - **Zod**: Schema validation
 - **Multer**: File upload handling
 - **Moment**: Date/time manipulation

@@ -21,7 +21,7 @@ import {
   UpdatePatientParamsSchema,
   UpdatePatientSchema,
 } from './dto/update-patient.dto';
-import { IPatient } from '@aafiat/common';
+import { IPatient } from '@alireza-lavasani/afiyet-common';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { MongooseError } from 'mongoose';
 import {

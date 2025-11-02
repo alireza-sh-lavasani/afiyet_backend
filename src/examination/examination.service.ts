@@ -1,4 +1,4 @@
-import { IExamination } from '@aafiat/common';
+import { IExamination } from '@alireza-lavasani/afiyet-common';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError } from 'mongoose';
